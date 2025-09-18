@@ -15,7 +15,7 @@ def mouse_callback(event, _x, _y, flags, param):
         pausar_video = not pausar_video
         
 # Cargar el video
-video_path = 'V1_procesado.mp4'  # Cambia esto al camino de tu video
+video_path = '../Videos Procesados/V1_procesado.mp4'  # Cambia esto al camino de tu video
 cap = cv2.VideoCapture(video_path, cv2.CAP_MSMF)
 
 #validate if cap is open

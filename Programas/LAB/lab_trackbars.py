@@ -1,11 +1,9 @@
 import cv2
 import numpy as np
 
-# -------------------------------------------------------------
-# Control de flujo del video
-# -------------------------------------------------------------
 pausar_video = False
 frame_a_frame = False
+ultimo_frame = None  # Guardar el último frame para reprocesarlo cuando se pausa
 
 def mouse_callback(event, x, y, flags, param):
     global pausar_video, frame_a_frame
@@ -15,26 +13,20 @@ def mouse_callback(event, x, y, flags, param):
         if pausar_video:
             frame_a_frame = True
 
-# -------------------------------------------------------------
-# Funciones auxiliares
-# -------------------------------------------------------------
 def nothing(x):
     pass
 
 
-
+cv2.namedWindow("Ajustes Lab")
 # Trackbars para el rango Lab (L, a, b)
-cv2.createTrackbar("L Min", "Ajustes Lab", 0, 255, nothing)
-cv2.createTrackbar("L Max", "Ajustes Lab", 255, 255, nothing)
-cv2.createTrackbar("a Min", "Ajustes Lab", 60, 255, nothing)
-cv2.createTrackbar("a Max", "Ajustes Lab", 120, 255, nothing)
-cv2.createTrackbar("b Min", "Ajustes Lab", 0, 255, nothing)
+cv2.createTrackbar("L Min", "Ajustes Lab", 42, 255, nothing)
+cv2.createTrackbar("L Max", "Ajustes Lab", 121, 255, nothing)
+cv2.createTrackbar("a Min", "Ajustes Lab", 90, 255, nothing)
+cv2.createTrackbar("a Max", "Ajustes Lab", 118, 255, nothing)
+cv2.createTrackbar("b Min", "Ajustes Lab", 150, 255, nothing)
 cv2.createTrackbar("b Max", "Ajustes Lab", 255, 255, nothing)
 
-# -------------------------------------------------------------
-# Video de entrada
-# -------------------------------------------------------------
-video_path = "V1_procesado.mp4"
+video_path = "../Videos Procesados/V1_procesado.mp4"
 cap = cv2.VideoCapture(video_path)
 if not cap.isOpened():
     print("Error: no se pudo abrir el video")
@@ -42,21 +34,20 @@ if not cap.isOpened():
 
 cv2.namedWindow("Video")
 cv2.setMouseCallback("Video", mouse_callback)
-cv2.namedWindow("Ajustes Lab")
 
-# -------------------------------------------------------------
-# Procesamiento del video
-# -------------------------------------------------------------
 while True:
+    # Solo leer un nuevo frame si no está pausado
     if not pausar_video or frame_a_frame:
         ret, frame = cap.read()
         if not ret:
             break
-
         frame = cv2.resize(frame, (540, 960))
+        ultimo_frame = frame.copy()  # Guardamos este frame
+        frame_a_frame = False
 
+    if ultimo_frame is not None:
         # Convertir a espacio Lab
-        lab = cv2.cvtColor(frame, cv2.COLOR_BGR2Lab)
+        lab = cv2.cvtColor(ultimo_frame, cv2.COLOR_BGR2Lab)
 
         # Leer valores de trackbars
         l_min = cv2.getTrackbarPos("L Min", "Ajustes Lab")
@@ -80,10 +71,8 @@ while True:
         mask_lab = cv2.medianBlur(mask_lab, 5)
 
         # Mostrar resultados
-        cv2.imshow("Video", frame)
+        cv2.imshow("Video", ultimo_frame)
         cv2.imshow("Mascara Lab", mask_lab)
-
-        frame_a_frame = False
 
     if cv2.waitKey(10) & 0xFF == 27:  # ESC para salir
         break
