@@ -41,11 +41,11 @@ def nothing(x):
 
 # Crear una ventana con controles deslizantes (trackbars)
 cv2.namedWindow("Trackbars")
-cv2.createTrackbar("H Min", "Trackbars", 35, 179, nothing)
-cv2.createTrackbar("H Max", "Trackbars", 85, 179, nothing)
-cv2.createTrackbar("S Min", "Trackbars", 100, 255, nothing)
+cv2.createTrackbar("H Min", "Trackbars", 40, 179, nothing)
+cv2.createTrackbar("H Max", "Trackbars", 80, 179, nothing)
+cv2.createTrackbar("S Min", "Trackbars", 80, 255, nothing)
 cv2.createTrackbar("S Max", "Trackbars", 255, 255, nothing)
-cv2.createTrackbar("V Min", "Trackbars", 30, 255, nothing)
+cv2.createTrackbar("V Min", "Trackbars", 40, 255, nothing)
 cv2.createTrackbar("V Max", "Trackbars", 255, 255, nothing)
 
 
