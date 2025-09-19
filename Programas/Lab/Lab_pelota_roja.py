@@ -32,9 +32,9 @@ if not cap.isOpened():
 fps = cap.get(cv2.CAP_PROP_FPS)     # Frames por segundo del video
 dt = 1.0 / fps                      # Intervalo de tiempo entre frames
 
-# Rango de color LAB para detectar la pelota verde
-lower_lab = np.array([0, 154, 70])
-upper_lab = np.array([255, 255, 255])
+# Rango de color Lab para detectar la pelota roja
+lower_red = np.array([0, 154, 70])
+upper_red = np.array([255, 255, 255])
 
 # Listas para guardar datos de la trayectoria
 tiempos = []
@@ -58,9 +58,9 @@ while True:
         # Redimensionamos video a tamaño fijo
         frame = cv2.resize(frame, (540, 960))
 
-        # Convertir a espacio HSV y aplicar máscara por rango de color
-        hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2Lab)
-        mask = cv2.inRange(hsv, lower_lab, upper_lab)
+        # Convertir a espacio Lab y aplicar máscara por rango de color
+        Lab = cv2.cvtColor(frame, cv2.COLOR_BGR2Lab)
+        mask = cv2.inRange(Lab, lower_red, upper_red)
 
         # Procesamiento morfológico para eliminar ruido en la máscara
         kernel_small = np.ones((3, 3), np.uint8)    # Kernel pequeño para eliminar puntos de ruido
