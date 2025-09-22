@@ -171,9 +171,6 @@ t_teorico = np.linspace(0, tiempo_vuelo, 300)
 x_teorico = x_inicial + v0_x * t_teorico
 y_teorico = altura_inicial + v0_y * t_teorico - 0.5 * g * t_teorico**2
 
-# --- Ajuste: alinear con la posición final real (en cm) ---
-x_teorico = x_teorico - x_teorico[-1] + x_suav[-1]
-y_teorico = y_teorico - y_teorico[-1] + y_suav[-1]
 
 # -------------------------------------------------------------
 # Convertir trayectoria teórica a píxeles para el video
@@ -187,12 +184,11 @@ final_teo_px = (
     int(alto_video_px - (y_teorico[-1] / escala_cm_px))
 )
 
-# Desplazamiento en píxeles necesario para que coincidan
-dx = final_real_px[0] - final_teo_px[0]
+# Desplazamiento en píxeles necesario para que coincidan con el suelo
 dy = final_real_px[1] - final_teo_px[1]
 
 # Aplicar desplazamiento a toda la curva teórica
-x_teo_px = (x_teorico / escala_cm_px).astype(int) + dx
+x_teo_px = (x_teorico / escala_cm_px).astype(int)
 y_teo_px = (alto_video_px - (y_teorico / escala_cm_px)).astype(int) + dy
 
 # Limitar dentro del frame
@@ -278,10 +274,10 @@ while True:
             centro_px = (int(centros[frame_idx][0]), int(centros[frame_idx][1]))
             cv2.circle(frame, centro_px, 3, (0, 0, 255), -1)  # punto real
 
-            escala_vel = 2
+            escala_vel = 1
             end_x = int(centros[frame_idx][0] + vel_x * escala_vel)
             end_y = int(centros[frame_idx][1] - vel_y * escala_vel)
-            cv2.arrowedLine(frame, centro_px, (end_x, end_y), (0, 255, 0), 2)
+            cv2.arrowedLine(frame, centro_px, (end_x, end_y), (0, 255, 0), 3)
 
         # Dibujar curva teórica
         for i in range(len(x_teo_px) - 1):
@@ -334,7 +330,7 @@ plt.show()
 plt.figure(figsize=(8, 6))
 plt.plot(x_suav, y_suav, "o-", label="Trayectoria obtenida")
 plt.quiver(x_suav, y_suav, ax, ay, color="red", angles="xy",
-           scale_units="xy", scale=400, label="Vectores de aceleración")
+           scale_units="xy", scale=300,width=0.004, label="Vectores de aceleración")
 plt.xlabel("X (cm)")
 plt.ylabel("Altura Y (cm)")
 plt.title("Trayectoria con vectores de aceleración")
