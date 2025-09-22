@@ -2,7 +2,7 @@ import cv2
 import os
 
 # Ruta del video
-video_path = "../../Videos Originales/V1.mp4"
+video_path = "../../Videos Originales/V3.mp4"
 
 # Carpeta donde se guardarán los frames
 output_folder = "frames"

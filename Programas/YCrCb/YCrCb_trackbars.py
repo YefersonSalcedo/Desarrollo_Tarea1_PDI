@@ -18,14 +18,14 @@ def nothing(x):
 
 # Crear ventana de trackbars
 cv2.namedWindow("Ajustes YCrCb")
-cv2.createTrackbar("Y Min", "Ajustes YCrCb", 60, 255, nothing)
+cv2.createTrackbar("Y Min", "Ajustes YCrCb", 45, 255, nothing)
 cv2.createTrackbar("Y Max", "Ajustes YCrCb", 255, 255, nothing)
-cv2.createTrackbar("Cr Min", "Ajustes YCrCb", 50, 255, nothing)
-cv2.createTrackbar("Cr Max", "Ajustes YCrCb", 102, 255, nothing)
-cv2.createTrackbar("Cb Min", "Ajustes YCrCb", 70, 255, nothing)
+cv2.createTrackbar("Cr Min", "Ajustes YCrCb", 0, 255, nothing)
+cv2.createTrackbar("Cr Max", "Ajustes YCrCb", 150, 255, nothing)
+cv2.createTrackbar("Cb Min", "Ajustes YCrCb", 65, 255, nothing)
 cv2.createTrackbar("Cb Max", "Ajustes YCrCb", 170, 255, nothing)
 
-video_path = "../Videos Procesados/R2_procesado.mp4"
+video_path = "../Videos Procesados/V1_procesado.mp4"
 cap = cv2.VideoCapture(video_path)
 if not cap.isOpened():
     print("Error: no se pudo abrir el video")
@@ -40,14 +40,16 @@ while True:
         ret, frame = cap.read()
         if not ret:
             break
-        frame = cv2.resize(frame, (540, 960))
+        # Redimensionamos video a tamaño fijo
+        # frame = cv2.resize(frame, (540, 960))   #desktop
+        frame = cv2.resize(frame, (360, 640))  # laptop
         ultimo_frame = frame.copy()  # Guardamos este frame
         frame_a_frame = False
 
     if ultimo_frame is not None:
         # Convertir a espacio YCrCb
         ycrcb = cv2.cvtColor(ultimo_frame, cv2.COLOR_BGR2YCrCb)
-        ycrcb = cv2.bitwise_not(ycrcb)  # Invertir: ahora la pelota es blanca y el fondo negro
+
 
         # Leer valores de trackbars
         y_min = cv2.getTrackbarPos("Y Min", "Ajustes YCrCb")

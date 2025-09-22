@@ -33,8 +33,8 @@ fps = cap.get(cv2.CAP_PROP_FPS)     # Frames por segundo del video
 dt = 1.0 / fps                      # Intervalo de tiempo entre frames
 
 # Rango de color Lab para detectar la pelota verde
-lower_green = np.array([42, 90, 150])
-upper_green = np.array([121, 118, 255])
+lower_green = np.array([60, 70, 150])
+upper_green = np.array([255, 130, 255])
 
 # Listas para guardar datos de la trayectoria
 tiempos = []
@@ -56,7 +56,8 @@ while True:
             break
 
         # Redimensionamos video a tamaño fijo
-        frame = cv2.resize(frame, (540, 960))
+        # frame = cv2.resize(frame, (540, 960))   #desktop
+        frame = cv2.resize(frame, (360, 640))  # laptop
 
         # Convertir a espacio Lab y aplicar máscara por rango de color
         Lab = cv2.cvtColor(frame, cv2.COLOR_BGR2Lab)

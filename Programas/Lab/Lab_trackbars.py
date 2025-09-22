@@ -19,10 +19,10 @@ def nothing(x):
 
 cv2.namedWindow("Ajustes Lab")
 # Trackbars para el rango Lab (L, a, b)
-cv2.createTrackbar("L Min", "Ajustes Lab", 42, 255, nothing)
-cv2.createTrackbar("L Max", "Ajustes Lab", 121, 255, nothing)
-cv2.createTrackbar("a Min", "Ajustes Lab", 90, 255, nothing)
-cv2.createTrackbar("a Max", "Ajustes Lab", 118, 255, nothing)
+cv2.createTrackbar("L Min", "Ajustes Lab", 60, 255, nothing)
+cv2.createTrackbar("L Max", "Ajustes Lab", 255, 255, nothing)
+cv2.createTrackbar("a Min", "Ajustes Lab", 70, 255, nothing)
+cv2.createTrackbar("a Max", "Ajustes Lab", 125, 255, nothing)
 cv2.createTrackbar("b Min", "Ajustes Lab", 150, 255, nothing)
 cv2.createTrackbar("b Max", "Ajustes Lab", 255, 255, nothing)
 
@@ -41,7 +41,8 @@ while True:
         ret, frame = cap.read()
         if not ret:
             break
-        frame = cv2.resize(frame, (540, 960))
+        #frame = cv2.resize(frame, (540, 960))   #desktop
+        frame = cv2.resize(frame, (360, 640))  #laptop
         ultimo_frame = frame.copy()  # Guardamos este frame
         frame_a_frame = False
 

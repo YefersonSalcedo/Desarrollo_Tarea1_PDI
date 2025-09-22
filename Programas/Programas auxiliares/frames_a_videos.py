@@ -5,7 +5,7 @@ import os
 input_dir = "frames"
 
 # Nombre del archivo de salida (video reconstruido en MP4)
-output_video = "../Videos Procesados/V1_procesado.mp4"
+output_video = "../Videos Procesados/V3_procesado.mp4"
 
 # Obtener lista de archivos ordenados (aseguramos que sean imágenes)
 frames = sorted([f for f in os.listdir(input_dir) if f.endswith(".jpg") or f.endswith(".png")])
