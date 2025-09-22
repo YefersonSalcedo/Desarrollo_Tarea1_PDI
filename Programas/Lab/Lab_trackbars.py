@@ -23,10 +23,19 @@ cv2.createTrackbar("L Min", "Ajustes Lab", 60, 255, nothing)
 cv2.createTrackbar("L Max", "Ajustes Lab", 255, 255, nothing)
 cv2.createTrackbar("a Min", "Ajustes Lab", 70, 255, nothing)
 cv2.createTrackbar("a Max", "Ajustes Lab", 125, 255, nothing)
-cv2.createTrackbar("b Min", "Ajustes Lab", 150, 255, nothing)
+cv2.createTrackbar("b Min", "Ajustes Lab", 154, 255, nothing)
 cv2.createTrackbar("b Max", "Ajustes Lab", 255, 255, nothing)
 
 video_path = "../Videos Procesados/V1_procesado.mp4"
+
+#desktop
+alto_video_px = 960
+ancho_video_px = 540
+
+# laptop
+#alto_video_px = 640
+#ancho_video_px = 360
+
 cap = cv2.VideoCapture(video_path)
 if not cap.isOpened():
     print("Error: no se pudo abrir el video")
@@ -41,8 +50,7 @@ while True:
         ret, frame = cap.read()
         if not ret:
             break
-        #frame = cv2.resize(frame, (540, 960))   #desktop
-        frame = cv2.resize(frame, (360, 640))  #laptop
+        frame = cv2.resize(frame, (ancho_video_px, alto_video_px))
         ultimo_frame = frame.copy()  # Guardamos este frame
         frame_a_frame = False
 
