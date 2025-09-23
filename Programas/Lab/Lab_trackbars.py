@@ -22,7 +22,7 @@ cv2.namedWindow("Ajustes Lab")
 cv2.createTrackbar("L Min", "Ajustes Lab", 60, 255, nothing)
 cv2.createTrackbar("L Max", "Ajustes Lab", 255, 255, nothing)
 cv2.createTrackbar("a Min", "Ajustes Lab", 70, 255, nothing)
-cv2.createTrackbar("a Max", "Ajustes Lab", 125, 255, nothing)
+cv2.createTrackbar("a Max", "Ajustes Lab", 150, 255, nothing)
 cv2.createTrackbar("b Min", "Ajustes Lab", 154, 255, nothing)
 cv2.createTrackbar("b Max", "Ajustes Lab", 255, 255, nothing)
 
