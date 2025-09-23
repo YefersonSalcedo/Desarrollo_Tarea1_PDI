@@ -146,20 +146,23 @@ acel_magnitudes = np.sqrt(ax**2 + ay**2)
 # =============================================================
 g = 981.0  # gravedad (cm/s²)
 
-# Ajuste lineal en X: pendiente = velocidad inicial en X
+# Componente horizontal (X)
+# Se ajusta una recta X(t) ≈ v0_x * t + x_inicial
 coef_x = np.polyfit(tiempos, x_suav, 1)
-v0_x = coef_x[0]
-x_inicial = coef_x[1]
+v0_x = coef_x[0]        # Velocidad inicial en X (cm/s)
+x_inicial = coef_x[1]   # Posición inicial en X (cm)
 
-# Ajuste en Y considerando gravedad
+# Componente vertical (Y)
+# En Y hay aceleración (gravedad). Para linealizar se suma el término (1/2 * g * t²):
+# Y(t) + (1/2 * g * t²) ≈ v0_y * t + y_inicial
 y_adj = y_suav + 0.5 * g * tiempos**2
 coef_y = np.polyfit(tiempos, y_adj, 1)
-v0_y = coef_y[0]
-altura_inicial = coef_y[1]
+v0_y = coef_y[0]           # Velocidad inicial en Y (cm/s)
+altura_inicial = coef_y[1] # Altura inicial (cm)
 
 # Magnitud de la velocidad inicial y ángulo
-v0 = np.linalg.norm([v0_x, v0_y])
-angulo_inicial = np.degrees(np.arctan2(v0_y, v0_x))
+v0 = np.linalg.norm([v0_x, v0_y])                    # Velocidad inicial total (vectorial)
+angulo_inicial = np.degrees(np.arctan2(v0_y, v0_x))  # Ángulo en grados respecto al eje X
 
 # Tiempo total de vuelo, alcance máximo y altura máxima
 disc = v0_y**2 + 2 * g * altura_inicial
@@ -170,10 +173,22 @@ altura_maxima = altura_inicial + (v0_y**2) / (2 * g)
 # =============================================================
 # TRAYECTORIA TEÓRICA
 # =============================================================
+# Generar un conjunto de tiempos para suavizar la curva teórica
 t_teorico = np.linspace(0, tiempo_vuelo, 300)
+
+# Ecuaciones de la parábola
 x_teorico = x_inicial + v0_x * t_teorico
 y_teorico = altura_inicial + v0_y * t_teorico - 0.5 * g * t_teorico**2
 
+# Velocidades teóricas
+vx_teorico = np.gradient(x_teorico, t_teorico)
+vy_teorico = np.gradient(y_teorico, t_teorico)
+vel_teorico = np.sqrt(vx_teorico**2 + vy_teorico**2)
+
+# Aceleraciones teóricas
+ax_teorico = np.gradient(vx_teorico, t_teorico)
+ay_teorico = np.gradient(vy_teorico, t_teorico)
+acel_teorico = np.sqrt(ax_teorico**2 + ay_teorico**2)
 
 # =============================================================
 # CONVERTIR TRAYECTORIA A PÍXELES PARA EL VIDEO
@@ -240,6 +255,7 @@ fourcc = cv2.VideoWriter_fourcc(*'mp4v')
 out = cv2.VideoWriter('video_analizado.mp4', fourcc, fps, (ancho_video_px, alto_video_px))
 
 frame_idx = 0
+suma_acel = 0
 while True:
     ret, frame = cap.read()
     if not ret: # Se terminó el video
@@ -258,6 +274,10 @@ while True:
         # Aceleración instantánea en este frame
         acel_instant = acel_magnitudes[frame_idx] if frame_idx < len(acel_magnitudes) else 0
 
+        # Actualizar promedio hasta este frame
+        suma_acel += acel_instant
+        acel_promedio = suma_acel / (frame_idx + 1)
+
         # Posición suavizada en centímetros
         pos_x_cm = x_suav[frame_idx] if frame_idx < len(x_suav) else x_suav[-1]
         pos_y_cm = y_suav[frame_idx] if frame_idx < len(y_suav) else y_suav[-1]
@@ -272,9 +292,10 @@ while True:
             # Datos instantáneos
             "DATOS INSTANTANEOS:",
             f"Tiempo actual: {t:.2f} s",
-            f"Velocidad total: {vel_total:.1f} cm/s",
+            f"Velocidad: {vel_total:.1f} cm/s",
             f"Aceleracion: {acel_instant:.1f} cm/s2",
-            f"Posicion (X,Y): ({pos_x_cm:.1f}, {pos_y_cm:.1f}) cm",
+            f"Acel. prom.: {acel_promedio:.1f} cm/s2",
+            f"Posicion(X,Y): ({pos_x_cm:.1f}, {pos_y_cm:.1f}) cm",
             "",
             # Parámetros iniciales del lanzamiento
             "PARAMETROS INICIALES:",
@@ -350,22 +371,40 @@ plt.show()
 
 # 2) Velocidad en función del tiempo
 plt.figure(figsize=(8, 4))
-plt.plot(tiempos, vel_magnitudes, "b-o", label="|V| magnitud")  # Magnitud de la velocidad (norma de Vx y Vy)
+plt.plot(tiempos, vel_magnitudes, "bo-", label="Velocidad obtenida")
+plt.plot(t_teorico, vel_teorico, "r--", label="Velocidad teórica")
 plt.xlabel("Tiempo (s)")
 plt.ylabel("Velocidad (cm/s)")
-plt.title("Velocidad en función del tiempo")
+plt.title("Comparación: Velocidad obtenida vs teórica")
 plt.legend()
 plt.grid(True)
 plt.show()
 
-# 3) Trayectoria con vectores de aceleración
-plt.figure(figsize=(8, 6))
-plt.plot(x_suav, y_suav, "o-", label="Trayectoria obtenida")
-plt.quiver(x_suav, y_suav, ax, ay, color="red", angles="xy",# Vectores de aceleración en cada punto (flechas rojas)
-           scale_units="xy", scale=150,width=0.003, label="Vectores de aceleración")
-plt.xlabel("X (cm)")
-plt.ylabel("Altura Y (cm)")
-plt.title("Trayectoria con vectores de aceleración")
-plt.legend()
-plt.grid(True)
+# 3) Trayectorias con vectores de aceleración
+fig, axes = plt.subplots(1, 2, figsize=(14, 6))
+
+#Teórica
+axes[0].plot(x_teorico, y_teorico, "g--", label="Trayectoria teórica")
+axes[0].quiver(x_teorico[::10], y_teorico[::10],
+               np.zeros_like(x_teorico[::10]), -g*np.ones_like(y_teorico[::10]),
+               color="blue", angles="xy", scale_units="xy", scale=150, width=0.004,
+               label="Aceleración teórica")
+axes[0].set_xlabel("X (cm)")
+axes[0].set_ylabel("Altura Y (cm)")
+axes[0].set_title("Trayectoria con aceleración teórica")
+axes[0].legend()
+axes[0].grid(True)
+
+# Experimental
+axes[1].plot(x_suav, y_suav, "o-", label="Trayectoria obtenida")
+axes[1].quiver(x_suav[::2], y_suav[::2], ax[::2], ay[::2],
+               color="red", angles="xy", scale_units="xy", scale=150, width=0.004,
+               label="Aceleración obtenida")
+axes[1].set_xlabel("X (cm)")
+axes[1].set_ylabel("Altura Y (cm)")
+axes[1].set_title("Trayectoria con aceleración obtenida")
+axes[1].legend()
+axes[1].grid(True)
+
+plt.tight_layout()
 plt.show()
