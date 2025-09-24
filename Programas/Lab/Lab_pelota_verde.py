@@ -221,27 +221,52 @@ y_teo_px = np.clip(y_teo_px, 0, alto_video_px - 1)
 print("\n--- RESULTADOS DEL ANÁLISIS DE MOVIMIENTO ---")
 print(f"Escala: 1 px = {escala_cm_px:.3f} cm")
 print(f"Total de frames analizados: {len(centros)}")
-
-print("\nVelocidades por frame (cm/s):")
-for i, v in enumerate(vel_magnitudes):
-    print(f"t = {tiempos[i]:.3f} s -> {v:.2f} cm/s")
-
-print("\nAceleraciones por frame (cm/s²):")
-for i, a in enumerate(acel_magnitudes):
-    print(f"t = {tiempos[i]:.3f} s -> {a:.2f} cm/s²")
-
-print("\nResumen global:")
 print(f"Velocidad inicial: |V0| = {v0:.2f} cm/s")
-print(f"Velocidad promedio: {np.mean(vel_magnitudes):.2f} cm/s")
-print(f"Aceleración promedio: {np.mean(acel_magnitudes):.2f} cm/s²")
 print(f"Ángulo inicial: {angulo_inicial:.2f}°")
 print(f"Altura inicial: {altura_inicial:.2f} cm")
-print(f"Posición final: X = {x_suav[-1]:.2f} cm, Y = {y_suav[-1]:.2f} cm")
 
-print("\nResultados teóricos:")
+# -------------------------------
+# Valores obtenidos del experimento
+# -------------------------------
+tiempo_vuelo_obt = tiempos[-1] - tiempos[0]
+vel_prom_obt = np.mean(vel_magnitudes)
+acel_prom_obt = np.mean(acel_magnitudes)
+altura_max_obt = np.max(y_suav)
+alcance_max_obt = x_suav[-1]
+
+print("\nValores obtenidos:")
+print(f"Tiempo de vuelo: {tiempo_vuelo_obt:.3f} s")
+print(f"Velocidad promedio: {vel_prom_obt:.2f} cm/s")
+print(f"Aceleración promedio: {acel_prom_obt:.2f} cm/s²")
+print(f"Altura máxima: {altura_max_obt:.2f} cm")
+print(f"Alcance máximo: {alcance_max_obt:.2f} cm")
+
+# -------------------------------
+# Valores esperados teóricos
+# -------------------------------
+vel_prom_teo = np.mean(vel_teorico)
+acel_prom_teo = np.mean(acel_teorico)
+
+print("\nEsperados teóricos:")
 print(f"Tiempo de vuelo: {tiempo_vuelo:.3f} s")
-print(f"Alcance máximo: {alcance_maximo:.2f} cm")
+print(f"Velocidad promedio: {vel_prom_teo:.2f} cm/s")
+print(f"Aceleración promedio: {acel_prom_teo:.2f} cm/s²")
 print(f"Altura máxima: {altura_maxima:.2f} cm")
+print(f"Alcance máximo: {alcance_maximo:.2f} cm")
+
+# -------------------------------
+# Errores porcentuales
+# -------------------------------
+def error_porcentual(obt, teo):
+    return abs((obt - teo) / teo) * 100 if teo != 0 else float('nan')
+
+print("\nErrores porcentuales:")
+print(f"Tiempo de vuelo: {error_porcentual(tiempo_vuelo_obt, tiempo_vuelo):.2f}%")
+print(f"Velocidad promedio: {error_porcentual(vel_prom_obt, vel_prom_teo):.2f}%")
+print(f"Aceleración promedio: {error_porcentual(acel_prom_obt, acel_prom_teo):.2f}%")
+print(f"Altura máxima: {error_porcentual(altura_max_obt, altura_maxima):.2f}%")
+print(f"Alcance máximo: {error_porcentual(alcance_max_obt, alcance_maximo):.2f}%")
+
 
 # =============================================================
 # CREAR VIDEO CON RESULTADOS
