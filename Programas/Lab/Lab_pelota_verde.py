@@ -71,10 +71,8 @@ while True:
         kernel_small = np.ones((3, 3), np.uint8)    # Kernel pequeño para eliminar puntos de ruido
         kernel_large = np.ones((7, 7), np.uint8)    # Kernel grande para cerrar huecos
 
-
         mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel_small) # "Opening" elimina pequeños objetos irrelevantes
         mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel_large)# "Closing" rellena huecos dentro de la región detectada
-        mask = cv2.medianBlur(mask, 5)                         # Filtro para suavizar bordes de la máscara
 
         # Encontrar contornos y calcular centro de la pelota
         contornos, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
